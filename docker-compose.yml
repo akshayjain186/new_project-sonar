@@ -1,0 +1,106 @@
+# version: '3.8'
+
+# services:
+#   # User service container
+#   user-service:
+#     build:
+#       context: ./backend/user-service  # Path to your user service directory
+#     env_file:
+#       - ./shared/config/.env  # Path to the shared .env file
+#     environment:
+#       - DB_TYPE=${DB_TYPE:-sqlite}  # Default to SQLite if DB_TYPE is not specified
+#       - DB_NAME=${DB_NAME:-./backend/user-service/database.sqlite}  # Default SQLite path
+#     networks:
+#       - turnkey-network
+#     ports:
+#       - "7001:7001"  # Expose port 7001 for local access
+
+#   # Product service container
+#   product-service:
+#     build:
+#       context: ./backend/services  # Path to your product service directory
+#     env_file:
+#       - ./shared/config/.env  # Path to the shared .env file
+#     environment:
+#       - DB_TYPE=${DB_TYPE:-sqlite}  # Default to SQLite if DB_TYPE is not specified
+#       - DB_NAME=${DB_NAME:-./backend/services/database.sqlite}  # Default SQLite path
+#     networks:
+#       - turnkey-network
+#     ports:
+#       - "7002:7002"  # Expose port 7002 for local access
+#     depends_on:
+#       - user-service  # Only this direction remains
+
+#   # Frontend container
+#   gui_tky:
+#     build:
+#       context: ./frontend/GUI_TKY
+#     image: turnkey-gui_tky
+#     ports:
+#       - "7000:7000"
+#     environment:
+#       - NODE_ENV=development
+#       - PORT=7000
+#     networks:
+#       - turnkey-network
+
+# # Network configuration
+# networks:
+#   turnkey-network:
+#     driver: bridge
+
+
+
+version: '3.8'
+
+cleamservices:
+  # User service container
+  user-service:
+    build:
+      context: ./backend/user-service  # Path to your user service directory
+    env_file:
+      - ./shared/config/.env  # Path to the shared .env file
+    environment:
+      - DB_TYPE=${DB_TYPE:-sqlite}  # Default to SQLite if DB_TYPE is not specified
+      - DB_NAME=${DB_NAME:-./backend/user-service/database.sqlite}  # Default SQLite path
+      - SONAR_TOKEN=7a8a62636f41ad6eef43401473b10d56194d4134  # SonarQube token for analysis
+    networks:
+      - turnkey-network
+    ports:
+      - "7001:7001"  # Expose port 7001 for local access
+
+  # Product service container
+  product-service:
+    build:
+      context: ./backend/services  # Path to your product service directory
+    env_file:
+      - ./shared/config/.env  # Path to the shared .env file
+    environment:
+      - DB_TYPE=${DB_TYPE:-sqlite}  # Default to SQLite if DB_TYPE is not specified
+      - DB_NAME=${DB_NAME:-./backend/services/database.sqlite}  # Default SQLite path
+      - SONAR_TOKEN=7a8a62636f41ad6eef43401473b10d56194d4134  # SonarQube token for analysis
+    networks:
+      - turnkey-network
+    ports:
+      - "7002:7002"  # Expose port 7002 for local access
+    depends_on:
+      - user-service  # Ensure product service starts only after user service is up
+
+  # Frontend container (GUI)
+  gui_tky:
+    build:
+      context: ./frontend/GUI_TKY
+    image: turnkey-gui_tky
+    environment:
+      - NODE_ENV=development
+      - PORT=7000
+      - SONAR_TOKEN=7a8a62636f41ad6eef43401473b10d56194d4134  # SonarQube token for analysis
+    ports:
+      - "7000:7000"  # Expose port 7000 for local access
+    networks:
+      - turnkey-network
+
+# Network configuration
+networks:
+  turnkey-network:
+    driver: bridge  # Use the bridge driver for isolated networking between services
